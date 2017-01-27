@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: ed56fe7556f22a346bb0ad9095f5a916
+timeCreated: 1485437849
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - wall: {instanceID: 0}
+  - stone: {instanceID: 0}
+  - water: {instanceID: 0}
+  - health: {instanceID: 0}
+  - coin: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
