@@ -39,29 +39,14 @@ public class WallInstance : MonoBehaviour {
     }
     Vector3 position;
     int health = 4;
-    int damage;
+    int damage=0;
     GameObject brick;
     ServerListener listner;
     public void setListener(ServerListener listner)
     {
         this.listner = listner;
     }
-    public bool isThis(int x, int y)
-    {
-        if (((int)position.x) == x && ((int)position.y == y))
-        {
-            return true;
-        }
-        return false;
-    }
-    public bool isThis(Vector3 vec)
-    {
-        if (position.x == vec.x && position.y == vec.y)
-        {
-            return true;
-        }
-        return false;
-    }
+   
     public void setPosition(Vector3 position)
     {
         this.position = position;

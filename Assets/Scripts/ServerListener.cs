@@ -60,6 +60,7 @@ public class ServerListener : MonoBehaviour
 
     // Use this for initialization
     int playerId;
+    bool b = false;
 
     //Intelligent System
     public String[,] map = new String[10,10];
@@ -143,8 +144,14 @@ public class ServerListener : MonoBehaviour
                     }
                     else
                     {
+                        
                         tank2Game.transform.position = t.getPosition();
                         tank2Game.transform.rotation = t.getRotation();
+                        if (t.getPosition().y != 0 && b)
+                        {
+                            tank2Game.SendMessage("fireBullet");
+                            b = false;
+                        }
                     }
                 }
                 else if (playerID == 2)
@@ -281,6 +288,7 @@ public class ServerListener : MonoBehaviour
                             float coin = float.Parse(more[5]);
                             float point = float.Parse(more[6]);
                             t.setValues(position, rotation, shoot, coin, health, point);
+                            b = true;
                         }
                         else
                         {

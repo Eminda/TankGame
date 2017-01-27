@@ -48,7 +48,7 @@ public class Bullet : MonoBehaviour {
         Quaternion initRotation = transform.rotation;
         this.rotation = rotation;
 
-        b = true;
+        //b = true;
     }
     void OnCollisionEnter2D(Collision2D col)
     {
