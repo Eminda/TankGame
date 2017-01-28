@@ -60,7 +60,7 @@ public class ServerListener : MonoBehaviour
 
     // Use this for initialization
     int playerId;
-    bool b = false;
+ 
 
     //Intelligent System
     public String[,] map = new String[10,10];
@@ -122,8 +122,7 @@ public class ServerListener : MonoBehaviour
             foreach(Tank t in tanks)
             {
                 int playerID = t.getPlayerID();
-                UnityEngine.Debug.logger.Log(playerID + "  abc"+tank1Game+" ddddddddddd "+tank2Game);
-                UnityEngine.Debug.logger.Log(playerID + "  abc" + tank1Game + " ddddddddddd " + tank2Game);
+
                 if (playerID == 0)
                 {
                     if (tank1Game == null)
@@ -134,6 +133,10 @@ public class ServerListener : MonoBehaviour
                     {
                         tank1Game.transform.position = t.getPosition();
                         tank1Game.transform.rotation = t.getRotation();
+                        if (t.getShoot())
+                        {
+                            tank1Game.SendMessage("fireBullet");
+                        }
                     }
                 }
                 else if (playerID == 1)
@@ -147,10 +150,9 @@ public class ServerListener : MonoBehaviour
                         
                         tank2Game.transform.position = t.getPosition();
                         tank2Game.transform.rotation = t.getRotation();
-                        if (t.getPosition().y != 0 && b)
+                        if (t.getShoot())
                         {
                             tank2Game.SendMessage("fireBullet");
-                            b = false;
                         }
                     }
                 }
@@ -164,6 +166,10 @@ public class ServerListener : MonoBehaviour
                     {
                         tank3Game.transform.position = t.getPosition();
                         tank3Game.transform.rotation = t.getRotation();
+                        if (t.getShoot())
+                        {
+                            tank3Game.SendMessage("fireBullet");
+                        }
                     }
                 }
                 else if (playerID == 3)
@@ -176,6 +182,10 @@ public class ServerListener : MonoBehaviour
                     {
                         tank4Game.transform.position = t.getPosition();
                         tank4Game.transform.rotation = t.getRotation();
+                        if (t.getShoot())
+                        {
+                            tank4Game.SendMessage("fireBullet");
+                        }
                     }
                 }
                 else if (playerID == 4)
@@ -188,6 +198,10 @@ public class ServerListener : MonoBehaviour
                     {
                         tank5Game.transform.position = t.getPosition();
                         tank5Game.transform.rotation = t.getRotation();
+                        if (t.getShoot())
+                        {
+                            tank5Game.SendMessage("fireBullet");
+                        }
                     }
                 }
             }
@@ -288,7 +302,7 @@ public class ServerListener : MonoBehaviour
                             float coin = float.Parse(more[5]);
                             float point = float.Parse(more[6]);
                             t.setValues(position, rotation, shoot, coin, health, point);
-                            b = true;
+
                         }
                         else
                         {

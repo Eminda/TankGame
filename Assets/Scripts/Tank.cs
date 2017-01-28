@@ -190,32 +190,45 @@ public class Tank : MonoBehaviour {
         Quaternion initialRotation = Quaternion.Euler(0, 0, 0); ;
         Debug.logger.Log("Firddd3333ing"+transform.rotation.z);
         int rotation = -1;
-        if (transform.rotation.z==0)
+        if (transform.rotation.z == 0)
         {
             initialRotation = Quaternion.Euler(0, 0, 90);
-            position1.y += 1.9f;
+            position1.y += 0.9f;
             rotation = 0;
+            GameObject game = Instantiate(bullet, position1, initialRotation) as GameObject;
+            game.SendMessage("setPosition", rotation);
+            Debug.logger.Log("Fireddd" + bullet);
         }
-        else if (transform.rotation.z == -0.7071068)
+        //else 
+        //Debug.logger.Log("AAAAAAAAAAAAAAAA" + transform.rotation.eulerAngles.z);
+        if (transform.rotation.eulerAngles.z == 90)
         {
             initialRotation = Quaternion.Euler(0, 0, 180);
-            position1.x += -1.9f;
+            position1.x += -0.9f;
             rotation = 3;
+            GameObject game = Instantiate(bullet, position1, initialRotation) as GameObject;
+            game.SendMessage("setPosition", rotation);
+            Debug.logger.Log("Fireddd" + bullet);
         }
-        else if (transform.rotation.z == 0.7071068)
+        if (transform.rotation.eulerAngles.z == 270)
         {
-            initialRotation =  Quaternion.Euler(0, 0, 0);
-            position1.x += 1.9f;
+            initialRotation = Quaternion.Euler(0, 0, 0);
+            position1.x += 0.9f;
             rotation = 1;
+            GameObject game = Instantiate(bullet, position1, initialRotation) as GameObject;
+            game.SendMessage("setPosition", rotation);
+            Debug.logger.Log("Fireddd" + bullet);
         }
-        else if(transform.rotation.z == -0.7071068*2 || transform.rotation.z == 0.7071068 * 2)
+        if (transform.rotation.eulerAngles.z == 180)
         {
-            position1.y -= 1.9f;
+            initialRotation = Quaternion.Euler(0, 0, -90);
+            position1.y -= 0.9f;
             rotation = 2;
+            GameObject game = Instantiate(bullet, position1, initialRotation) as GameObject;
+            game.SendMessage("setPosition", rotation);
+            Debug.logger.Log("Fireddd" + bullet);
         }
-        GameObject game = Instantiate(bullet, position1, initialRotation) as GameObject;
-        game.SendMessage("setPosition", rotation);
-        Debug.logger.Log("Fireddd" + bullet);
+
     }
     public void OnCollisionEnter2D(Collision2D col)
      {
