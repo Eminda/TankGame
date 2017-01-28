@@ -20,6 +20,12 @@ public class ServerConnect : MonoBehaviour
     public static readonly String Down = "DOWN#";
     public static readonly String Left = "LEFT#";
     public static readonly String Right = "RIGHT#";
+    public static ServerConnect serverConnect;
+
+    public ServerConnect()
+    {
+        ServerConnect.serverConnect = this;
+    }
     //public static 
     // Use this for initialization
     void Start()

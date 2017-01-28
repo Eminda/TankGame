@@ -60,7 +60,7 @@ public class ServerListener : MonoBehaviour
 
     // Use this for initialization
     int playerId;
- 
+    bool b=false;
 
     //Intelligent System
     public String[,] map = new String[10,10];
@@ -73,8 +73,26 @@ public class ServerListener : MonoBehaviour
         thread.Start();
 
     }
+    float time = 0;int count = 0;bool start = false;
     void Update()
     {
+        if (b)
+        {
+            time += Time.deltaTime;
+            if(b && time > 1.2 && (!start)) {
+                UnityEngine.Debug.logger.Log("Moving right"+Time.time+"   "+(++count));
+                ServerConnect.serverConnect.right();
+                time = 0;
+                start = true;
+                b = false;
+            }else if(b && start)
+            {
+                ServerConnect.serverConnect.right();
+                b = false;
+            }
+            
+
+        }
         //initialize bord if data had recevied
         if (!bordInitialized)
         {
@@ -106,7 +124,8 @@ public class ServerListener : MonoBehaviour
             GameObject game = Instantiate(coin, c.getPosition(), initializingRotation) as GameObject;
             //Send data to coin. So that it can work independently later
             game.SendMessage("setValues", new int[] { c.getTimeLeft(), c.getCoinValue() });
-            UnityEngine.Debug.logger.Log("Coin   " + c.getX() + "," + c.getY() + " " + c.getCoinValue() + "  time" + c.getTimeLeft());
+            map[(int)c.getX(), -(int)c.getY()] = "C:" + (Time.time + c.getTimeLeft());
+            //UnityEngine.Debug.logger.Log("Coin   " + c.getX() + "," + c.getY() + " " + c.getCoinValue() + "  time" + c.getTimeLeft());
         }
         while (healthToDraw.Count > 0)
         {
@@ -115,7 +134,8 @@ public class ServerListener : MonoBehaviour
             GameObject game = Instantiate(health, c.getPosition(), initializingRotation) as GameObject;
             //Send data to coin. So that it can work independently later
             game.SendMessage("setValues", c.getTimeLeft());
-            UnityEngine.Debug.logger.Log("Health   " + c.getX() + "," + c.getY()  + "  time" + c.getTimeLeft());
+            map[(int)c.getX(), -(int)c.getY()] = "H:" + (Time.time + c.getTimeLeft());
+            //UnityEngine.Debug.logger.Log("Health   " + c.getX() + "," + c.getY()  + "  time" + c.getTimeLeft());
         }
         if(tanks.Count>0)
         {
@@ -243,7 +263,8 @@ public class ServerListener : MonoBehaviour
 
                 }
                 String[] datas = value.Split(':');
-                //UnityEngine.Debug.logger.Log(datas[0]+"   "+value);
+               // UnityEngine.Debug.logger.Log(Time.time);
+                UnityEngine.Debug.logger.Log(datas[0]+"   "+value);
                 if (datas[0].Equals("I"))
                 {
                     String player = datas[1];
@@ -286,6 +307,7 @@ public class ServerListener : MonoBehaviour
                 }
                 else if (datas[0].ToUpper().Equals("G"))
                 {
+                    b = true;
                     for (int i = 1; i < datas.Length; i++)
                     {
                         String[] more = datas[i].Split(';');
@@ -301,6 +323,7 @@ public class ServerListener : MonoBehaviour
                             float health = float.Parse(more[4]);
                             float coin = float.Parse(more[5]);
                             float point = float.Parse(more[6]);
+                            if(t.getX()!=position.x || t.getY()!=position.y || t.getRotationZ()!= rotation.eulerAngles.z) { b = true; }
                             t.setValues(position, rotation, shoot, coin, health, point);
 
                         }
@@ -322,7 +345,7 @@ public class ServerListener : MonoBehaviour
                         }
                         
                     }
-                    UnityEngine.Debug.logger.Log("Tank count "+tanks.Count);
+                    //UnityEngine.Debug.logger.Log("Tank count "+tanks.Count);
                 }
                 // Call an external function (void) given. 
 
@@ -451,6 +474,18 @@ public class ServerListener : MonoBehaviour
         {
             return shoot;
         }
+        public float getX()
+        {
+            return position.x;
+        }
+        public float getY()
+        {
+            return position.y;
+        }
+        public float getRotationZ()
+        {
+            return rotation.eulerAngles.z;
+        }
         public Tank(int PlayerID,Vector3 pos,Quaternion rotation,bool shot,float coin,float health,float point)
         {
             this.playerID = PlayerID;
@@ -492,14 +527,14 @@ public class ServerListener : MonoBehaviour
     {
         for(int i = 0; i < this.tanks.Count; i++)
         {
-            UnityEngine.Debug.logger.Log("hekk" + id+"  "+ tanks[i].getPlayerID());
+            //UnityEngine.Debug.logger.Log("hekk" + id+"  "+ tanks[i].getPlayerID());
             if (tanks[i].getPlayerID() == id)
             {
                 UnityEngine.Debug.logger.Log("hekk" + id);
                 return tanks[i];
             }
         }
-        UnityEngine.Debug.logger.Log("Tank Creating"+id);
+        //UnityEngine.Debug.logger.Log("Tank Creating"+id);
         Tank t = new Tank(id);
         tanks.Add(t);
         return t;
