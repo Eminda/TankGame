@@ -95,6 +95,7 @@ public class ServerConnect : MonoBehaviour
     }
     public  void shoot()
     {
+        UnityEngine.Debug.Log("Shoot called");
         send(Shoot);
     }
 

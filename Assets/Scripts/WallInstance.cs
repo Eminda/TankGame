@@ -14,26 +14,26 @@ public class WallInstance : MonoBehaviour {
         int h = 4 - damage;
         if (health != h)
         {
-            Destroy(brick);
-            if (damage == 1)
-            {
-                brick = Instantiate(listner.wallHit1, position, Quaternion.Euler(0, 0, 0)) as GameObject;
-                listner.map[(int)position.x, -(int)position.y] = "B3";
-            }
-            else if (damage == 2)
-            {
-                brick = Instantiate(listner.wallHit2, position, Quaternion.Euler(0, 0, 0)) as GameObject;
-                listner.map[(int)position.x, -(int)position.y] = "B2";
-            }
-            else if (damage == 3)
-            {
-                brick = Instantiate(listner.wallHit3, position, Quaternion.Euler(0, 0, 0)) as GameObject;
-                listner.map[(int)position.x, -(int)position.y] = "B1";
-            }
-            else
-            {
-                listner.map[(int)position.x, -(int)position.y] = null;
-            }
+            //Destroy(brick);
+            //if (damage == 1)
+            //{
+            //    brick = Instantiate(listner.wallHit1, position, Quaternion.Euler(0, 0, 0)) as GameObject;
+            //    listner.map[(int)position.x, -(int)position.y] = "B3";
+            //}
+            //else if (damage == 2)
+            //{
+            //    brick = Instantiate(listner.wallHit2, position, Quaternion.Euler(0, 0, 0)) as GameObject;
+            //    listner.map[(int)position.x, -(int)position.y] = "B2";
+            //}
+            //else if (damage == 3)
+            //{
+            //    brick = Instantiate(listner.wallHit3, position, Quaternion.Euler(0, 0, 0)) as GameObject;
+            //    listner.map[(int)position.x, -(int)position.y] = "B1";
+            //}
+            //else
+            //{
+            //    listner.map[(int)position.x, -(int)position.y] = null;
+            //}
         }
         health = h;
     }

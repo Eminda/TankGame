@@ -34,6 +34,10 @@ public class Health : MonoBehaviour {
         if (col.gameObject.tag == "Tank")
         {
             col.gameObject.SendMessage("healthGained");
+            Vector3 pos = transform.position;
+            int x = (int)pos.x;
+            int y = -(int)pos.y;
+            ServerListener.serverListener.map[x, y] = null;
             Destroy(gameObject);
         }
     }

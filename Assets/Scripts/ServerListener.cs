@@ -65,8 +65,10 @@ public class ServerListener : MonoBehaviour
 
     //Intelligent System
     public String[,] map = new String[10,10];
+    public static ServerListener serverListener;
     void Start()
     {
+        serverListener = this;
         //Console.WriteLine("Thread is comming on the way");
         initializingRotation = transform.rotation;
         //UnityEngine.Debug.logger.Log("Thread is comming on the way");
@@ -149,6 +151,7 @@ public class ServerListener : MonoBehaviour
                         if (t.getShoot())
                         {
                             tank1Game.SendMessage("fireBullet");
+                            t.setShoot(false);
                         }
                     }
                 }
@@ -169,7 +172,7 @@ public class ServerListener : MonoBehaviour
                         fillPredictions(t.getPosition(), getDirection(t.getRotation()));
                         if (t.getShoot())
                         {
-                            tank2Game.SendMessage("fireBullet");
+                            tank2Game.SendMessage("fireBullet"); t.setShoot(false);
                         }
                     }
                 }
@@ -190,7 +193,7 @@ public class ServerListener : MonoBehaviour
                         fillPredictions(t.getPosition(), getDirection(t.getRotation()));
                         if (t.getShoot())
                         {
-                            tank3Game.SendMessage("fireBullet");
+                            tank3Game.SendMessage("fireBullet"); t.setShoot(false);
                         }
                     }
                 }
@@ -211,7 +214,7 @@ public class ServerListener : MonoBehaviour
                         fillPredictions(t.getPosition(), getDirection(t.getRotation()));
                         if (t.getShoot())
                         {
-                            tank4Game.SendMessage("fireBullet");
+                            tank4Game.SendMessage("fireBullet"); t.setShoot(false);
                         }
                     }
                 }
@@ -232,7 +235,7 @@ public class ServerListener : MonoBehaviour
                         fillPredictions(t.getPosition(), getDirection(t.getRotation()));
                         if (t.getShoot())
                         {
-                            tank5Game.SendMessage("fireBullet");
+                            tank5Game.SendMessage("fireBullet"); t.setShoot(false);
                         }
                     }
                 }
@@ -492,6 +495,10 @@ public class ServerListener : MonoBehaviour
         float point;
         float health;
         bool shoot;
+        public void setShoot(bool shoot)
+        {
+            this.shoot = shoot;
+        }
        public float getCoin()
         {
             return coin;

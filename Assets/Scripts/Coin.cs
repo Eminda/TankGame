@@ -21,6 +21,10 @@ public class Coin : MonoBehaviour {
             if (timeLeft < 0)
             {
                 UnityEngine.Debug.logger.Log("Coin  vanished " + value + "  time" + timeLeft+" "+Time.time);
+                Vector3 pos = transform.position;
+                int x = (int)pos.x;
+                int y = -(int)pos.y;
+                ServerListener.serverListener.map[x, y] = null;
                 Destroy(gameObject);
             }
         }
