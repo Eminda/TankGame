@@ -52,7 +52,7 @@ public class ServerConnect : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            UnityEngine.Debug.Log("up is called");
+            //UnityEngine.Debug.Log("up is called");
             new System.Threading.Thread(up).Start();
 
 

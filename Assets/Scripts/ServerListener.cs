@@ -61,6 +61,7 @@ public class ServerListener : MonoBehaviour
     // Use this for initialization
     int playerId;
     bool b=false;
+    int countG = 0;
 
     //Intelligent System
     public String[,] map = new String[10,10];
@@ -71,28 +72,12 @@ public class ServerListener : MonoBehaviour
         //UnityEngine.Debug.logger.Log("Thread is comming on the way");
         var thread = new System.Threading.Thread(listen);
         thread.Start();
-
+        Automation.setServerListener(this);
     }
     float time = 0;int count = 0;bool start = false;
     void Update()
     {
-        if (b)
-        {
-            time += Time.deltaTime;
-            if(b && time > 1.2 && (!start)) {
-                UnityEngine.Debug.logger.Log("Moving right"+Time.time+"   "+(++count));
-                ServerConnect.serverConnect.right();
-                time = 0;
-                start = true;
-                b = false;
-            }else if(b && start)
-            {
-                ServerConnect.serverConnect.right();
-                b = false;
-            }
-            
-
-        }
+        
         //initialize bord if data had recevied
         if (!bordInitialized)
         {
@@ -124,7 +109,7 @@ public class ServerListener : MonoBehaviour
             GameObject game = Instantiate(coin, c.getPosition(), initializingRotation) as GameObject;
             //Send data to coin. So that it can work independently later
             game.SendMessage("setValues", new int[] { c.getTimeLeft(), c.getCoinValue() });
-            map[(int)c.getX(), -(int)c.getY()] = "C:" + (Time.time + c.getTimeLeft());
+            map[(int)c.getX(), -(int)c.getY()] = "C:" + (Time.time + c.getTimeLeft()) + ":" + c.getCoinValue() ;
             //UnityEngine.Debug.logger.Log("Coin   " + c.getX() + "," + c.getY() + " " + c.getCoinValue() + "  time" + c.getTimeLeft());
         }
         while (healthToDraw.Count > 0)
@@ -139,7 +124,10 @@ public class ServerListener : MonoBehaviour
         }
         if(tanks.Count>0)
         {
-            foreach(Tank t in tanks)
+            //UnityEngine.Debug.logger.Log("Prediction Start");
+            clearPredictions();
+            //UnityEngine.Debug.logger.Log("Prediction END");
+            foreach (Tank t in tanks)
             {
                 int playerID = t.getPlayerID();
 
@@ -151,8 +139,13 @@ public class ServerListener : MonoBehaviour
                     }
                     else
                     {
+                        Vector3 pos = tank1Game.transform.position;
+
+                        map[(int)pos.x, -(int)pos.y] = null;
+                        map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T0"+getDirection(t.getRotation());
                         tank1Game.transform.position = t.getPosition();
                         tank1Game.transform.rotation = t.getRotation();
+                        fillPredictions(t.getPosition(),getDirection(t.getRotation()));
                         if (t.getShoot())
                         {
                             tank1Game.SendMessage("fireBullet");
@@ -167,9 +160,13 @@ public class ServerListener : MonoBehaviour
                     }
                     else
                     {
-                        
+                        Vector3 pos = tank1Game.transform.position;
+
+                        map[(int)pos.x, -(int)pos.y] = null;
+                        map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T1";
                         tank2Game.transform.position = t.getPosition();
                         tank2Game.transform.rotation = t.getRotation();
+                        fillPredictions(t.getPosition(), getDirection(t.getRotation()));
                         if (t.getShoot())
                         {
                             tank2Game.SendMessage("fireBullet");
@@ -184,8 +181,13 @@ public class ServerListener : MonoBehaviour
                     }
                     else
                     {
+                        Vector3 pos = tank1Game.transform.position;
+
+                        map[(int)pos.x, -(int)pos.y] = null;
+                        map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T2";
                         tank3Game.transform.position = t.getPosition();
                         tank3Game.transform.rotation = t.getRotation();
+                        fillPredictions(t.getPosition(), getDirection(t.getRotation()));
                         if (t.getShoot())
                         {
                             tank3Game.SendMessage("fireBullet");
@@ -200,8 +202,13 @@ public class ServerListener : MonoBehaviour
                     }
                     else
                     {
+                        Vector3 pos = tank1Game.transform.position;
+
+                        map[(int)pos.x, -(int)pos.y] = null;
+                        map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T3";
                         tank4Game.transform.position = t.getPosition();
                         tank4Game.transform.rotation = t.getRotation();
+                        fillPredictions(t.getPosition(), getDirection(t.getRotation()));
                         if (t.getShoot())
                         {
                             tank4Game.SendMessage("fireBullet");
@@ -216,8 +223,13 @@ public class ServerListener : MonoBehaviour
                     }
                     else
                     {
+                        Vector3 pos = tank1Game.transform.position;
+
+                        map[(int)pos.x, -(int)pos.y] = null;
+                        map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T4";
                         tank5Game.transform.position = t.getPosition();
                         tank5Game.transform.rotation = t.getRotation();
+                        fillPredictions(t.getPosition(), getDirection(t.getRotation()));
                         if (t.getShoot())
                         {
                             tank5Game.SendMessage("fireBullet");
@@ -226,7 +238,32 @@ public class ServerListener : MonoBehaviour
                 }
             }
             }
+        //Automation part of the tank
 
+        if (b)
+        {
+            time += Time.deltaTime;
+            if (b && time > 1.2 && (!start))
+            {
+                //UnityEngine.Debug.logger.Log("Moving right" + Time.time + "   " + (++count));
+                Tank ta = getTankObject(playerId);
+                Automation.GiveNextCommand(ta.getPosition(), ta.getDirection(), playerId, (int)ta.getHealth());
+                // ServerConnect.serverConnect.right();
+                time = 0;
+                start = true;
+                b = false;
+            }
+            else if (b && start)
+            {
+                //UnityEngine.Debug.logger.Log("Moving right" + Time.time + "   " + (++count));
+                //ServerConnect.serverConnect.right();
+                Tank ta = getTankObject(playerId);
+                Automation.GiveNextCommand(ta.getPosition(), ta.getDirection(), playerId, (int)ta.getHealth());
+                b = false;
+            }
+
+
+            }
         }
    
     void listen()
@@ -307,7 +344,8 @@ public class ServerListener : MonoBehaviour
                 }
                 else if (datas[0].ToUpper().Equals("G"))
                 {
-                    b = true;
+                    countG++;
+                    bool x = false; ;
                     for (int i = 1; i < datas.Length; i++)
                     {
                         String[] more = datas[i].Split(';');
@@ -323,7 +361,14 @@ public class ServerListener : MonoBehaviour
                             float health = float.Parse(more[4]);
                             float coin = float.Parse(more[5]);
                             float point = float.Parse(more[6]);
-                            if(t.getX()!=position.x || t.getY()!=position.y || t.getRotationZ()!= rotation.eulerAngles.z) { b = true; }
+                            if (countG < 2)
+                            {
+                                if (t.getX() != position.x || t.getY() != position.y || t.getRotationZ() != rotation.eulerAngles.z) { x = true; }
+                            }
+                            else
+                            {
+                                x = true;
+                            }
                             t.setValues(position, rotation, shoot, coin, health, point);
 
                         }
@@ -345,6 +390,7 @@ public class ServerListener : MonoBehaviour
                         }
                         
                     }
+                    b = x;
                     //UnityEngine.Debug.logger.Log("Tank count "+tanks.Count);
                 }
                 // Call an external function (void) given. 
@@ -486,6 +532,23 @@ public class ServerListener : MonoBehaviour
         {
             return rotation.eulerAngles.z;
         }
+        public int getDirection()
+        {
+            if ((int)getRotationZ() == 0)
+            {
+                return 0;
+            }else if ((int)getRotationZ() == 180)
+            {
+                return 2;
+            }else if ((int)getRotationZ() == 90)
+            {
+                return 3;
+            }
+            else
+            {
+                return 1;
+            }
+        }
         public Tank(int PlayerID,Vector3 pos,Quaternion rotation,bool shot,float coin,float health,float point)
         {
             this.playerID = PlayerID;
@@ -530,7 +593,7 @@ public class ServerListener : MonoBehaviour
             //UnityEngine.Debug.logger.Log("hekk" + id+"  "+ tanks[i].getPlayerID());
             if (tanks[i].getPlayerID() == id)
             {
-                UnityEngine.Debug.logger.Log("hekk" + id);
+                //UnityEngine.Debug.logger.Log("hekk" + id);
                 return tanks[i];
             }
         }
@@ -539,6 +602,75 @@ public class ServerListener : MonoBehaviour
         tanks.Add(t);
         return t;
         
+    }
+    private int getDirection(Quaternion rotation)
+    {
+        if (transform.rotation.eulerAngles.z == 90)
+        {
+            return 3;
+        }else if(transform.rotation.eulerAngles.z == 180)
+        {
+            return 2;
+        }else if(transform.rotation.eulerAngles.z == 270)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    private void clearPredictions()
+    {
+        //UnityEngine.Debug.logger.Log("ADDDDDDDDDDDDDDDDD");
+        for (int x = 0; x < map.GetLength(0); x += 1)
+        {
+            for (int y = 0; y < map.GetLength(1); y += 1)
+            {
+                //UnityEngine.Debug.logger.Log("QDDDDDDDDDDDDDDDDD");
+                if (map[x, y] != null) {
+                    if (map[x, y].Substring(0, 1).ToUpper().Equals("P"))
+                    {
+                        map[x, y] = null;
+                    }
+                }
+                
+            }
+        }
+    }
+    private void fillPredictions(Vector3 pos,int direction)
+    {
+        int x = (int)pos.x;
+        int y = -(int)pos.y;
+        try {
+            if (direction == 0)
+            {
+                if (map[x, y + 1] == null) {
+                    map[x, y + 1] = "P1";
+                }
+            } else if (direction == 2)
+            {
+                if (map[x, y - 1] == null)
+                {
+                    map[x, y - 1] = "P1";
+                }
+            } else if (direction == 1)
+            {
+                if (map[x + 1, y] == null)
+                {
+                    map[x + 1, y] = "P1";
+                }
+            } else if (direction == 3)
+            {
+                if (map[x - 1, y] == null)
+                {
+                    map[x - 1, y] = "P1";
+                }
+            }
+        }catch(Exception e)
+        {
+
+        }
     }
 }
 

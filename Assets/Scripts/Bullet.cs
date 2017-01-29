@@ -44,7 +44,7 @@ public class Bullet : MonoBehaviour {
 	}
     void setPosition(int rotation)
     {
-        Debug.logger.Log("Message received");
+        //Debug.logger.Log("Message received");
         Quaternion initRotation = transform.rotation;
         this.rotation = rotation;
 

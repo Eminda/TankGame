@@ -188,7 +188,7 @@ public class Tank : MonoBehaviour {
     {
         Vector3 position1 = transform.position;
         Quaternion initialRotation = Quaternion.Euler(0, 0, 0); ;
-        Debug.logger.Log("Firddd3333ing"+transform.rotation.z);
+        //Debug.logger.Log("Firddd3333ing"+transform.rotation.z);
         int rotation = -1;
         if (transform.rotation.z == 0)
         {
@@ -197,7 +197,7 @@ public class Tank : MonoBehaviour {
             rotation = 0;
             GameObject game = Instantiate(bullet, position1, initialRotation) as GameObject;
             game.SendMessage("setPosition", rotation);
-            Debug.logger.Log("Fireddd" + bullet);
+            //Debug.logger.Log("Fireddd" + bullet);
         }
         //else 
         //Debug.logger.Log("AAAAAAAAAAAAAAAA" + transform.rotation.eulerAngles.z);
@@ -208,7 +208,7 @@ public class Tank : MonoBehaviour {
             rotation = 3;
             GameObject game = Instantiate(bullet, position1, initialRotation) as GameObject;
             game.SendMessage("setPosition", rotation);
-            Debug.logger.Log("Fireddd" + bullet);
+            //Debug.logger.Log("Fireddd" + bullet);
         }
         if (transform.rotation.eulerAngles.z == 270)
         {
@@ -217,7 +217,7 @@ public class Tank : MonoBehaviour {
             rotation = 1;
             GameObject game = Instantiate(bullet, position1, initialRotation) as GameObject;
             game.SendMessage("setPosition", rotation);
-            Debug.logger.Log("Fireddd" + bullet);
+            //Debug.logger.Log("Fireddd" + bullet);
         }
         if (transform.rotation.eulerAngles.z == 180)
         {
@@ -226,7 +226,7 @@ public class Tank : MonoBehaviour {
             rotation = 2;
             GameObject game = Instantiate(bullet, position1, initialRotation) as GameObject;
             game.SendMessage("setPosition", rotation);
-            Debug.logger.Log("Fireddd" + bullet);
+            //Debug.logger.Log("Fireddd" + bullet);
         }
 
     }
@@ -247,7 +247,7 @@ public class Tank : MonoBehaviour {
     }
     public void healthGained()
     {
-        Debug.logger.Log("Health restores");
+        //Debug.logger.Log("Health restores");
     }
     private void goRight()
     {
