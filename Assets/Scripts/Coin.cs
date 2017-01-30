@@ -24,7 +24,11 @@ public class Coin : MonoBehaviour {
                 Vector3 pos = transform.position;
                 int x = (int)pos.x;
                 int y = -(int)pos.y;
-                ServerListener.serverListener.map[x, y] = null;
+                if (ServerListener.serverListener.map[x, y]!=null && ServerListener.serverListener.map[x, y].Substring(0, 1).Equals("C"))
+                {
+                    ServerListener.serverListener.map[x, y] = null;
+                }
+                
                 Destroy(gameObject);
             }
         }

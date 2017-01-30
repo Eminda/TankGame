@@ -11,6 +11,7 @@ public class Automation {
     private static int y;
     private static  int shooting = 0;
     private static  bool allowShoot = true;
+    private static int samePos = 0;
 
     public static void setServerListener(ServerListener lis)
     {
@@ -20,11 +21,22 @@ public class Automation {
     public static void GiveNextCommand(Vector3 current, int direction, int playerID,int health)
     {
         //UnityEngine.Debug.logger.Log("start 0");
-
+        
         List<Collectable> coins = new List<Collectable>();
         List<Tank> tanks = new List<Tank>();
         List<Collectable> healths = new List<Collectable>();
         //UnityEngine.Debug.logger.Log("Automation 0"+ serverListener.map);
+        for (int x1 = 0; x1 < serverListener.map.GetLength(0); x1 += 1)
+        {
+            String line = "";
+            for (int y1 = 0; y1 < serverListener.map.GetLength(1); y1 += 1)
+            {
+                line += " C " + serverListener.map[y1,x1];
+
+
+            }
+            UnityEngine.Debug.logger.Log(line);
+        }
         for (int x = 0; x < serverListener.map.GetLength(0); x += 1)
         {
             for (int y = 0; y < serverListener.map.GetLength(1); y += 1)
@@ -92,13 +104,14 @@ public class Automation {
         Collectable bestCoin = null; ;
         if (coins.Count > 0)
         {
-            //UnityEngine.Debug.logger.Log("Automation 4 Coin Count Greater than 0 :"+coins.Count+"  xx "+coins[0].Cost+"  "+coins[0].Command+"  "+coins[0].Value);
+            UnityEngine.Debug.logger.Log("Automation 4 Coin Count Greater than 0 :"+coins.Count+"  xx "+coins[0].Cost+"  "+coins[0].Command+"  "+coins[0].Value);
             Collectable bestCoinVal;
             Collectable bestCoinCost;
             
             List<Collectable> closerTome = new List<Collectable>();
             foreach(Collectable c in coins)
             {
+                UnityEngine.Debug.logger.Log("Min Cost Other "+ c.MinCostOther+" "+c.X+"  "+c.Y+"   "+c.Cost);
                 if (c.Cost < c.MinCostOther)
                 {
                     closerTome.Add(c);
@@ -107,22 +120,23 @@ public class Automation {
             if (closerTome.Count > 0)
             {
                 //UnityEngine.Debug.logger.Log("Automation 4 Closer");
-                bestCoinVal = closerTome[0];
-                foreach(Collectable c in closerTome)
-                {
-                    if (bestCoinVal.Value < c.Value && c.Cost<(int)(c.Disapear-Time.time))
-                    {
-                        bestCoinVal = c;
-                    }
-                }
+                //bestCoinVal = closerTome[0];
+                //foreach(Collectable c in closerTome)
+                //{
+                //    if (bestCoinVal.Value < c.Value && c.Cost<(int)(c.Disapear-Time.time))
+                //    {
+                //        bestCoinVal = c;
+                //    }
+                //}
                 bestCoinCost = closerTome[0];
                 foreach(Collectable c in closerTome)
                 {
-                    if (bestCoinCost.Cost > c.Cost && c.Cost < (int)(c.Disapear - Time.time))
+                    if (bestCoinCost.Cost > c.Cost && c.Cost < (int)(c.Disapear - Time.time-1))
                     {
                         bestCoinCost = c;
                     }
                 }
+                UnityEngine.Debug.logger.Log("Best Coin  a " + bestCoinCost.Cost + " " + bestCoinCost.X + "  " + bestCoinCost.Y);
                 //if (!bestCoinCost.Equals(bestCoinCost))
                 //{
                 //    if (bestCoinVal.Value - bestCoinCost.Value > 200)
@@ -149,11 +163,12 @@ public class Automation {
                 //}
                 //else
                 //{
-                    bestCoin = bestCoinCost;
+                bestCoin = bestCoinCost;
                 //}
             }
             else
             {
+                
                 int difference = 0;
                 bestCoin = coins[0];
                 foreach(Collectable c in coins)
@@ -163,14 +178,30 @@ public class Automation {
                         bestCoin = c;
                     }
                 }
+                UnityEngine.Debug.logger.Log("Best Coiddddn " + bestCoin.Cost + " " + bestCoin.X + "  " + bestCoin.Y);
             }
         }
         UnityEngine.Debug.logger.Log("Automation 5" + bestCoin+"   "+bestCoin.Command+"   "+bestCoin.X+"  "+bestCoin.Y);
+        
         if (bestCoin != null)
         {
             if(choosenCoin!=null && x==(int)current.x && y==-(int)current.y && bestCoin.X==choosenCoin.X && bestCoin.Y==choosenCoin.Y)
             {
                 bestCoin.Command = choosenCoin.Command;
+                samePos++;
+                
+            }
+            else if(x == (int)current.x && y == -(int)current.y && samePos>=3)
+            {
+                samePos = 0;
+                bestCoin.Command = choosenCoin.Command;
+            }else if(x == (int)current.x && y == -(int)current.y)
+            {
+                samePos++;
+            }
+            else
+            {
+                samePos = 0;
             }
             try
             {
@@ -197,12 +228,12 @@ public class Automation {
                         shooting = 0;
                     }
                 UnityEngine.Debug.logger.Log("Automation 5 invoke" + bestCoin.Command);
-                invokeCommand(bestCoin.Command);
+                invokeCommand(bestCoin.Command,(int)current.x,(int)-current.y);
             }
             UnityEngine.Debug.logger.Log("Automation 5" + bestCoin.Command);
             }catch(Exception e)
             {
-                UnityEngine.Debug.logger.Log("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz" + e.Message);
+               
             }
             
                 choosenCoin = bestCoin;
@@ -212,20 +243,39 @@ public class Automation {
         }
 
     }
-    private static void invokeCommand(String command)
+    private static void invokeCommand(String command,int x,int y)
     {
         if (command.Equals("UP"))
         {
-            ServerConnect.serverConnect.up();
+            UnityEngine.Debug.logger.Log("UP" + serverListener.map[x, y - 1]);
+            if (serverListener.map[x,y-1]==null || (  !serverListener.map[x, y - 1].Substring(0, 1).Equals("S") && !serverListener.map[x, y - 1].Substring(0, 1).Equals("W")))
+            {
+                ServerConnect.serverConnect.up();
+            }
+            
         }else if (command.Equals("DOWN"))
         {
-            ServerConnect.serverConnect.down();
+            UnityEngine.Debug.logger.Log("DOWN" + serverListener.map[x, y + 1]);
+            if (serverListener.map[x, y + 1] == null || (!serverListener.map[x, y + 1].Substring(0, 1).Equals("S") && !serverListener.map[x, y + 1].Substring(0, 1).Equals("W")))
+            {
+                ServerConnect.serverConnect.down();
+            }
+            
         }else if (command.Equals("LEFT"))
         {
-            ServerConnect.serverConnect.left();
-        }else if (command.Equals("RIGHT"))
+            UnityEngine.Debug.logger.Log("LEFT" + serverListener.map[x-1, y]);
+            if (serverListener.map[x-1, y] == null || (!serverListener.map[x - 1, y ].Substring(0, 1).Equals("S") && !serverListener.map[x - 1, y ].Substring(0, 1).Equals("W")))
+            {
+                ServerConnect.serverConnect.left();
+            }
+        }
+        else if (command.Equals("RIGHT"))
         {
-            ServerConnect.serverConnect.right(); 
+            UnityEngine.Debug.logger.Log("RIGHT" + serverListener.map[x+1, y]);
+            if (serverListener.map[x + 1, y] == null || (!serverListener.map[x + 1, y].Substring(0, 1).Equals("S") && !serverListener.map[x + 1, y].Substring(0, 1).Equals("W")))
+            {
+                ServerConnect.serverConnect.right();
+            }
         }
     }
     private static Vector3 getPositionToGo(String command,int x,int y)

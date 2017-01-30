@@ -65,6 +65,7 @@ public class ServerListener : MonoBehaviour
 
     //Intelligent System
     public String[,] map = new String[10,10];
+    private String[,] mapCopy = new String[10, 10];
     public static ServerListener serverListener;
     void Start()
     {
@@ -102,6 +103,7 @@ public class ServerListener : MonoBehaviour
                 Instantiate(water, vec, initializingRotation);
                 map[(int)vec.x, -(int)vec.y] = "W";
             }
+            mapCopy= map.Clone() as string[,];
             bordInitialized = true;
         }
         while (coinsToDraw.Count > 0)
@@ -128,6 +130,7 @@ public class ServerListener : MonoBehaviour
         {
             //UnityEngine.Debug.logger.Log("Prediction Start");
             clearPredictions();
+            string[,] mapCopy = serverListener.map.Clone() as string[,];
             //UnityEngine.Debug.logger.Log("Prediction END");
             foreach (Tank t in tanks)
             {
@@ -147,7 +150,11 @@ public class ServerListener : MonoBehaviour
                         map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T0"+getDirection(t.getRotation());
                         tank1Game.transform.position = t.getPosition();
                         tank1Game.transform.rotation = t.getRotation();
-                        fillPredictions(t.getPosition(),getDirection(t.getRotation()));
+                        if (playerId != playerID)
+                        {
+                            fillPredictions(t.getPosition(), getDirection(t.getRotation()));
+                        }
+                        
                         if (t.getShoot())
                         {
                             tank1Game.SendMessage("fireBullet");
@@ -169,7 +176,10 @@ public class ServerListener : MonoBehaviour
                         map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T1";
                         tank2Game.transform.position = t.getPosition();
                         tank2Game.transform.rotation = t.getRotation();
-                        fillPredictions(t.getPosition(), getDirection(t.getRotation()));
+                        if (playerId != playerID)
+                        {
+                            fillPredictions(t.getPosition(), getDirection(t.getRotation()));
+                        }
                         if (t.getShoot())
                         {
                             tank2Game.SendMessage("fireBullet"); t.setShoot(false);
@@ -190,7 +200,10 @@ public class ServerListener : MonoBehaviour
                         map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T2";
                         tank3Game.transform.position = t.getPosition();
                         tank3Game.transform.rotation = t.getRotation();
-                        fillPredictions(t.getPosition(), getDirection(t.getRotation()));
+                        if (playerId != playerID)
+                        {
+                            fillPredictions(t.getPosition(), getDirection(t.getRotation()));
+                        }
                         if (t.getShoot())
                         {
                             tank3Game.SendMessage("fireBullet"); t.setShoot(false);
@@ -211,7 +224,10 @@ public class ServerListener : MonoBehaviour
                         map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T3";
                         tank4Game.transform.position = t.getPosition();
                         tank4Game.transform.rotation = t.getRotation();
-                        fillPredictions(t.getPosition(), getDirection(t.getRotation()));
+                        if (playerId != playerID)
+                        {
+                            fillPredictions(t.getPosition(), getDirection(t.getRotation()));
+                        }
                         if (t.getShoot())
                         {
                             tank4Game.SendMessage("fireBullet"); t.setShoot(false);
@@ -232,7 +248,10 @@ public class ServerListener : MonoBehaviour
                         map[(int)t.getPosition().x, -(int)t.getPosition().y] = "T4";
                         tank5Game.transform.position = t.getPosition();
                         tank5Game.transform.rotation = t.getRotation();
-                        fillPredictions(t.getPosition(), getDirection(t.getRotation()));
+                        if (playerId != playerID)
+                        {
+                            fillPredictions(t.getPosition(), getDirection(t.getRotation()));
+                        }
                         if (t.getShoot())
                         {
                             tank5Game.SendMessage("fireBullet"); t.setShoot(false);
@@ -245,6 +264,22 @@ public class ServerListener : MonoBehaviour
 
         if (b)
         {
+            for (int x1 = 0; x1 < serverListener.map.GetLength(0); x1 += 1)
+            {
+                for (int y1 = 0; y1 < serverListener.map.GetLength(1); y1 += 1)
+                {
+                    if(mapCopy[x1,y1]!=null && mapCopy[x1, y1].Substring(0, 1).Equals("W"))
+                    {
+                        map[x1, y1] = "W";
+                    }
+                    if (mapCopy[x1, y1] != null && mapCopy[x1, y1].Substring(0, 1).Equals("S"))
+                    {
+                        map[x1, y1] = "S";
+                    }
+
+
+                }
+            }
             time += Time.deltaTime;
             if (b && time > 1.2 && (!start))
             {
@@ -300,6 +335,17 @@ public class ServerListener : MonoBehaviour
 
                     // Convert bytes to text. 
                     value = Encoding.UTF8.GetString(bytes.ToArray());
+
+                }
+                if (value.Substring(0, 8).Equals("OBSTACLE"))
+                {
+                    UnityEngine.Debug.logger.Log("Obstacle  ");
+                    GameObject tank = getTankByID(playerId);
+                    int x = (int)tank.transform.position.x;
+                    int y = -(int)tank.transform.position.y;
+                    Vector3 vec = getPositionToGo(getCommand(tank.transform.rotation), x, y);
+                    map[x, y] = "S";
+                    mapCopy[x, y] = "S";
 
                 }
                 String[] datas = value.Split(':');
@@ -423,6 +469,26 @@ public class ServerListener : MonoBehaviour
         }
         return vectors;
 
+    }
+    private static Vector3 getPositionToGo(String command, int x, int y)
+    {
+        if (command.Equals("UP"))
+        {
+            return new Vector3(x, y - 1);
+        }
+        else if (command.Equals("DOWN"))
+        {
+            return new Vector3(x, y + 1);
+        }
+        else if (command.Equals("LEFT"))
+        {
+            return new Vector3(x - 1, y);
+        }
+        else if (command.Equals("RIGHT"))
+        {
+            return new Vector3(x + 1, y);
+        }
+        return new Vector3(0, 0);
     }
     class CoinObject
     {
@@ -627,6 +693,25 @@ public class ServerListener : MonoBehaviour
             return 0;
         }
     }
+    private string getCommand(Quaternion rotation)
+    {
+        if (transform.rotation.eulerAngles.z == 90)
+        {
+            return "LEFT";
+        }
+        else if (transform.rotation.eulerAngles.z == 180)
+        {
+            return "DOWN";
+        }
+        else if (transform.rotation.eulerAngles.z == 270)
+        {
+            return "RIGHT";
+        }
+        else
+        {
+            return "UP";
+        }
+    }
     private void clearPredictions()
     {
         //UnityEngine.Debug.logger.Log("ADDDDDDDDDDDDDDDDD");
@@ -638,6 +723,7 @@ public class ServerListener : MonoBehaviour
                 if (map[x, y] != null) {
                     if (map[x, y].Substring(0, 1).ToUpper().Equals("P"))
                     {
+
                         map[x, y] = null;
                     }
                 }
@@ -652,14 +738,14 @@ public class ServerListener : MonoBehaviour
         try {
             if (direction == 0)
             {
-                if (map[x, y + 1] == null) {
-                    map[x, y + 1] = "P1";
+                if (map[x, y - 1] == null) {
+                    map[x, y - 1] = "P1";
                 }
             } else if (direction == 2)
             {
-                if (map[x, y - 1] == null)
+                if (map[x, y + 1] == null)
                 {
-                    map[x, y - 1] = "P1";
+                    map[x, y + 1] = "P1";
                 }
             } else if (direction == 1)
             {
